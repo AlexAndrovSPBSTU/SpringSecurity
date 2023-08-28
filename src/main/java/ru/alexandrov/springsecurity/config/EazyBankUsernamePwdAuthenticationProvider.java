@@ -1,4 +1,4 @@
-package ru.alexandrov.springsecurity.util;
+package ru.alexandrov.springsecurity.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -11,27 +11,25 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import ru.alexandrov.springsecurity.models.Customer;
-import ru.alexandrov.springsecurity.services.CustomersService;
+import ru.alexandrov.springsecurity.repositories.CustomersRepository;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Component
-public class CustomAuthenticationProvider implements AuthenticationProvider {
-    private final CustomersService customersService;
-    private final PasswordEncoder passwordEncoder;
+public class EazyBankUsernamePwdAuthenticationProvider implements AuthenticationProvider {
 
     @Autowired
-    public CustomAuthenticationProvider(CustomersService customersService, PasswordEncoder passwordEncoder) {
-        this.customersService = customersService;
-        this.passwordEncoder = passwordEncoder;
-    }
+    private CustomersRepository customerRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
         String username = authentication.getName();
         String pwd = authentication.getCredentials().toString();
-        List<Customer> customer = customersService.findByEmail(username);
+        List<Customer> customer = customerRepository.findByEmail(username);
         if (customer.size() > 0) {
             if (passwordEncoder.matches(pwd, customer.get(0).getPwd())) {
                 List<GrantedAuthority> authorities = new ArrayList<>();
@@ -40,7 +38,7 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
             } else {
                 throw new BadCredentialsException("Invalid password!");
             }
-        } else {
+        }else {
             throw new BadCredentialsException("No user registered with this details!");
         }
     }

@@ -3,31 +3,33 @@ package ru.alexandrov.springsecurity.controllers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import ru.alexandrov.springsecurity.models.Customer;
-import ru.alexandrov.springsecurity.services.CustomersService;
+import ru.alexandrov.springsecurity.repositories.CustomersRepository;
+
+import java.sql.Date;
+import java.util.List;
 
 @RestController
 public class LoginController {
-    private final CustomersService customersService;
-    private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public LoginController(CustomersService customersService, PasswordEncoder passwordEncoder) {
-        this.customersService = customersService;
-        this.passwordEncoder = passwordEncoder;
-    }
+    private CustomersRepository customerRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @PostMapping("/register")
     public ResponseEntity<String> registerUser(@RequestBody Customer customer) {
         Customer savedCustomer = null;
         ResponseEntity<String> response = null;
         try {
-            customer.setPwd(passwordEncoder.encode(customer.getPwd()));
-            savedCustomer = customersService.save(customer);
+            String hashPwd = passwordEncoder.encode(customer.getPwd());
+            customer.setPwd(hashPwd);
+            customer.setCreateDt(String.valueOf(new Date(System.currentTimeMillis())));
+            savedCustomer = customerRepository.save(customer);
             if (savedCustomer.getId() > 0) {
                 response = ResponseEntity
                         .status(HttpStatus.CREATED)
@@ -41,4 +43,9 @@ public class LoginController {
         return response;
     }
 
+    @GetMapping("/user")
+    public Customer getUserDetailsAfterLogin(Authentication authentication) {
+        List<Customer> customers = customerRepository.findByEmail(authentication.getName());
+        return customers.size() > 0 ? customers.get(0) : null;
+    }
 }

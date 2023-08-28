@@ -1,27 +1,30 @@
 package ru.alexandrov.springsecurity.models;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
-import org.springframework.security.core.userdetails.UserDetails;
 
 @Entity
-@Table(name = "customer")
 public class Customer {
+
     @Id
+    @GeneratedValue(strategy= GenerationType.IDENTITY)
     @Column(name = "customer_id")
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column(name = "pwd")
-    private String password;
+    private String name;
 
-    @Column(name = "email")
     private String email;
 
-    @Column(name = "role")
+    @Column(name = "mobile_number")
+    private String mobileNumber;
+
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    private String pwd;
+
     private String role;
 
-    public Customer() {
-    }
+    @Column(name = "create_dt")
+    private String createDt;
 
     public int getId() {
         return id;
@@ -29,6 +32,14 @@ public class Customer {
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getEmail() {
@@ -39,12 +50,20 @@ public class Customer {
         this.email = email;
     }
 
-    public String getPwd() {
-        return password;
+    public String getMobileNumber() {
+        return mobileNumber;
     }
 
-    public void setPwd(String password) {
-        this.password = password;
+    public void setMobileNumber(String mobileNumber) {
+        this.mobileNumber = mobileNumber;
+    }
+
+    public String getPwd() {
+        return pwd;
+    }
+
+    public void setPwd(String pwd) {
+        this.pwd = pwd;
     }
 
     public String getRole() {
@@ -53,5 +72,13 @@ public class Customer {
 
     public void setRole(String role) {
         this.role = role;
+    }
+
+    public String getCreateDt() {
+        return createDt;
+    }
+
+    public void setCreateDt(String createDt) {
+        this.createDt = createDt;
     }
 }
