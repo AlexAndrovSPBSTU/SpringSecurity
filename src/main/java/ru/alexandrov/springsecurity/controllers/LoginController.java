@@ -14,10 +14,8 @@ import java.util.List;
 
 @RestController
 public class LoginController {
-
     @Autowired
     private CustomersRepository customerRepository;
-
     @Autowired
     private PasswordEncoder passwordEncoder;
 
