@@ -1,7 +1,10 @@
 package ru.alexandrov.springsecurity.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
+
+import java.util.Set;
 
 @Entity
 public class Customer {
@@ -25,6 +28,10 @@ public class Customer {
 
     @Column(name = "create_dt")
     private String createDt;
+
+    @OneToMany(mappedBy = "customer",fetch = FetchType.EAGER)
+    @JsonIgnore
+    private Set<Authority> authorities;
 
     public int getId() {
         return id;
@@ -80,5 +87,13 @@ public class Customer {
 
     public void setCreateDt(String createDt) {
         this.createDt = createDt;
+    }
+
+    public Set<Authority> getAuthorities() {
+        return authorities;
+    }
+
+    public void setAuthorities(Set<Authority> authorities) {
+        this.authorities = authorities;
     }
 }
